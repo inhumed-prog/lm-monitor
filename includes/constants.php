@@ -8,6 +8,15 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+// Already defined in main file:
+// LM_MONITOR_VERSION
+// LM_MONITOR_PLUGIN_DIR
+// LM_MONITOR_PLUGIN_URL
+// LM_MONITOR_PLUGIN_FILE
+// LM_MONITOR_PLUGIN_BASENAME
+// LM_MONITOR_MIN_PHP_VERSION
+// LM_MONITOR_MIN_WP_VERSION
+
 /**
  * Database
  */
