@@ -80,7 +80,7 @@ if (!defined('ABSPATH')) {
 					type: 'POST',
 					data: {
 						action: 'lm_monitor_test_webhook',
-						nonce: '<?php echo wp_create_nonce('lm_monitor_nonce'); ?>'
+						nonce: '<?php echo esc_attr( wp_create_nonce( 'lm_monitor_nonce' ) ); ?>'
 					},
 					timeout: 15000,
 					success: function(response) {
