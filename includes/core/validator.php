@@ -45,7 +45,7 @@ function lm_monitor_validate_url($url) {
 	}
 
 	// Check if URL has a valid domain
-	$parsed = parse_url($url);
+	$parsed = wp_parse_url($url);
 	if (!isset($parsed['host'])) {
 		return array(
 			'valid' => false,
@@ -180,7 +180,7 @@ function lm_monitor_validate_webhook_url($url) {
 	}
 
 	// Parse URL
-	$parsed = parse_url($url);
+	$parsed = wp_parse_url($url);
 	if (!isset($parsed['host'])) {
 		return array(
 			'valid' => false,
