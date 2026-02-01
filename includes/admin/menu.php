@@ -172,6 +172,6 @@ function lm_monitor_add_contextual_help() {
     $screen->set_help_sidebar(
         '<p><strong>' . __('For More Information:', 'lm-monitor') . '</strong></p>' .
         '<p><a href="' . esc_url(admin_url('admin.php?page=lm-monitor-help')) . '">' . __('Documentation', 'lm-monitor') . '</a></p>' .
-        '<p><a href="https://lm-monitor.com/support" target="_blank">' . __('Support', 'lm-monitor') . '</a></p>'
+        '<p><a href="https://github.com/inhumed-prog/lm-monitor/issues" target="_blank">' . __('Support', 'lm-monitor') . '</a></p>'
     );
 }
