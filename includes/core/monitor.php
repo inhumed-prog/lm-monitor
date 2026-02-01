@@ -32,7 +32,7 @@ function lm_monitor_check_website($url) {
 	);
 
 	try {
-		// Make HTTP request with error handling
+		// Make HTTP request with proper error handling
 		$response = wp_remote_get($url, array(
 			'timeout' => LM_MONITOR_HTTP_TIMEOUT,
 			'redirection' => 5,
@@ -122,7 +122,7 @@ function lm_monitor_get_failed_check_result($error_message = '') {
  */
 function lm_monitor_get_ssl_info($url) {
 	// Parse URL
-	$parsed = parse_url($url);
+	$parsed = wp_parse_url($url);
 
 	if (!isset($parsed['host'])) {
 		return new WP_Error('invalid_url', __('Invalid URL - no host found', 'lm-monitor'));
@@ -148,8 +148,9 @@ function lm_monitor_get_ssl_info($url) {
 		));
 
 		// Set error handler to catch warnings
-		set_error_handler(function($errno, $errstr) {
-			throw new Exception($errstr, $errno);
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+		set_error_handler(function( $errno, $errstr ) {
+			throw new Exception( esc_html( $errstr ), intval( $errno ) );
 		});
 
 		// Try to connect and get certificate
@@ -174,7 +175,8 @@ function lm_monitor_get_ssl_info($url) {
 		$params = stream_context_get_params($client);
 
 		// Close connection
-		fclose($client);
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose($client);
 
 		// Check if certificate was captured
 		if (!isset($params['options']['ssl']['peer_certificate'])) {
@@ -243,9 +245,10 @@ function lm_monitor_render_status($status) {
 	}
 
 	// Handle error codes
-	$title = sprintf(__('Website returned status: %s', 'lm-monitor'), $status);
-	return '<span class="lm-monitor-badge error" title="' . esc_attr($title) . '">' .
-		esc_html($status) . '</span>';
+	/* translators: %s: HTTP status code */
+	$title = sprintf( __( 'Website returned status: %s', 'lm-monitor' ), $status );
+	return '<span class="lm-monitor-badge error" title="' . esc_attr( $title ) . '">' .
+		esc_html( $status ) . '</span>';
 }
 
 /**
@@ -274,7 +277,8 @@ function lm_monitor_render_response_time($response_time) {
 		$label = __('Slow', 'lm-monitor');
 	}
 
-	$title = sprintf(__('Response time: %s (%s)', 'lm-monitor'), $formatted_time . 'ms', $label);
+	/* translators: 1: Response time in ms, 2: Speed label (Fast/Slow/Very Slow) */
+	$title = sprintf( __( 'Response time: %1$s (%2$s)', 'lm-monitor' ), $formatted_time . 'ms', $label );
 
 	return sprintf(
 		'<span style="color: %s; font-weight: 500;" title="%s">%s ms</span>',
@@ -303,7 +307,8 @@ function lm_monitor_render_ssl_expiry($days_remaining, $expiry_date = null) {
 	if ($days_remaining < 0) {
 		$title = __('SSL certificate has EXPIRED!', 'lm-monitor');
 		if ($expiry_date) {
-			$title .= ' ' . sprintf(__('Expired on: %s', 'lm-monitor'), date_i18n(get_option('date_format'), strtotime($expiry_date)));
+			/* translators: %s: Expiry date */
+			$title .= ' ' . sprintf( __( 'Expired on: %s', 'lm-monitor' ), date_i18n( get_option( 'date_format' ), strtotime( $expiry_date ) ) );
 		}
 
 		return sprintf(
@@ -317,7 +322,8 @@ function lm_monitor_render_ssl_expiry($days_remaining, $expiry_date = null) {
 	// Determine urgency
 	$color = LM_MONITOR_COLOR_SUCCESS;
 	$icon = '';
-	$status = sprintf(_n('%d day', '%d days', $days_remaining, 'lm-monitor'), $days_remaining);
+	/* translators: %d: Number of days remaining */
+	$status = sprintf( _n( '%d day', '%d days', $days_remaining, 'lm-monitor' ), $days_remaining );
 
 	if ($days_remaining <= LM_MONITOR_SSL_CRITICAL_DAYS) {
 		$color = LM_MONITOR_COLOR_ERROR;
@@ -328,9 +334,11 @@ function lm_monitor_render_ssl_expiry($days_remaining, $expiry_date = null) {
 	}
 
 	// Build title
-	$title = sprintf(__('%d days until SSL expiration', 'lm-monitor'), $days_remaining);
+	/* translators: %d: Number of days until expiration */
+	$title = sprintf( __( '%d days until SSL expiration', 'lm-monitor' ), $days_remaining );
 	if ($expiry_date) {
-		$title .= ' - ' . sprintf(__('Expires: %s', 'lm-monitor'), date_i18n(get_option('date_format'), strtotime($expiry_date)));
+		/* translators: %s: Expiry date */
+		$title .= ' - ' . sprintf( __( 'Expires: %s', 'lm-monitor' ), date_i18n( get_option( 'date_format' ), strtotime( $expiry_date ) ) );
 	}
 
 	return sprintf(
@@ -389,7 +397,8 @@ function lm_monitor_render_uptime($uptime) {
 	return sprintf(
 		'<span style="color: %s; font-weight: 600;" title="%s">%s%%</span>',
 		esc_attr($color),
-		esc_attr(sprintf(__('Uptime: %s%%', 'lm-monitor'), $uptime)),
+		/* translators: %s: Uptime percentage */
+		esc_attr( sprintf( __( 'Uptime: %s%%', 'lm-monitor' ), $uptime ) ),
 		esc_html(number_format($uptime, 2))
 	);
 }
@@ -416,13 +425,16 @@ function lm_monitor_time_ago($datetime) {
 		return __('Just now', 'lm-monitor');
 	} elseif ($diff < 3600) {
 		$minutes = floor($diff / 60);
-		return sprintf(_n('%d minute ago', '%d minutes ago', $minutes, 'lm-monitor'), $minutes);
+		/* translators: %d: Number of minutes */
+		return sprintf( _n( '%d minute ago', '%d minutes ago', $minutes, 'lm-monitor' ), $minutes );
 	} elseif ($diff < 86400) {
 		$hours = floor($diff / 3600);
-		return sprintf(_n('%d hour ago', '%d hours ago', $hours, 'lm-monitor'), $hours);
+		/* translators: %d: Number of hours */
+		return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'lm-monitor' ), $hours );
 	} else {
 		$days = floor($diff / 86400);
-		return sprintf(_n('%d day ago', '%d days ago', $days, 'lm-monitor'), $days);
+		/* translators: %d: Number of days */
+		return sprintf( _n( '%d day ago', '%d days ago', $days, 'lm-monitor' ), $days );
 	}
 }
 
