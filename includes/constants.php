@@ -5,17 +5,8 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit;
+	exit;
 }
-
-// Already defined in main file:
-// LM_MONITOR_VERSION
-// LM_MONITOR_PLUGIN_DIR
-// LM_MONITOR_PLUGIN_URL
-// LM_MONITOR_PLUGIN_FILE
-// LM_MONITOR_PLUGIN_BASENAME
-// LM_MONITOR_MIN_PHP_VERSION
-// LM_MONITOR_MIN_WP_VERSION
 
 /**
  * Database
@@ -43,7 +34,6 @@ define('LM_MONITOR_HTTP_TIMEOUT', 30);
 define('LM_MONITOR_WEBHOOK_TIMEOUT', 10);
 define('LM_MONITOR_SSL_TIMEOUT', 10);
 define('LM_MONITOR_CRON_LOCK_DURATION', 300); // 5 minutes
-define('LM_MONITOR_HTTP_MAX_REDIRECTS', 5);
 
 /**
  * Performance Thresholds (in milliseconds)
@@ -130,9 +120,9 @@ define('LM_MONITOR_BLOCKED_HOSTS', array('localhost', '127.0.0.1', '0.0.0.0'));
  * Disposable Email Domains (Optional - can be expanded)
  */
 define('LM_MONITOR_DISPOSABLE_DOMAINS', array(
-    'tempmail.com',
-    '10minutemail.com',
-    'guerrillamail.com'
+	'tempmail.com',
+	'10minutemail.com',
+	'guerrillamail.com'
 ));
 
 /**
