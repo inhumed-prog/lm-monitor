@@ -150,6 +150,7 @@ function lm_monitor_add_contextual_help() {
 			'<p>%s</p><p>%s</p>',
 			__('LM Monitor helps you track the uptime and performance of multiple websites from one dashboard.', 'lm-monitor'),
 			sprintf(
+				/* translators: %s: Link to Help & Info page */
 				__('For more detailed information, visit the %s page.', 'lm-monitor'),
 				'<a href="' . esc_url(admin_url('admin.php?page=lm-monitor-help')) . '">' . __('Help & Info', 'lm-monitor') . '</a>'
 			)
