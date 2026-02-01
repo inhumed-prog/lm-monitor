@@ -323,7 +323,7 @@ if (!defined('ABSPATH')) {
 		<div class="lm-monitor-help-card">
 			<h2>Debug Information</h2>
 			<?php
-			$cron_status = lm_monitor_get_cron_status();
+			$lm_monitor_cron_status = lm_monitor_get_cron_status();
 			?>
 			<table class="lm-monitor-info-table">
 				<tr>
@@ -340,15 +340,15 @@ if (!defined('ABSPATH')) {
 				</tr>
 				<tr>
 					<th>Cron Scheduled</th>
-					<td><?php echo $cron_status['is_scheduled'] ? 'Yes' : 'No'; ?></td>
+					<td><?php echo $lm_monitor_cron_status['is_scheduled'] ? 'Yes' : 'No'; ?></td>
 				</tr>
 				<tr>
 					<th>Next Scheduled Check</th>
-					<td><?php echo esc_html($cron_status['next_run_formatted']); ?></td>
+					<td><?php echo esc_html($lm_monitor_cron_status['next_run_formatted']); ?></td>
 				</tr>
 				<tr>
 					<th>WordPress Cron Enabled</th>
-					<td><?php echo $cron_status['cron_enabled'] ? 'Yes' : 'No (DISABLE_WP_CRON is set)'; ?></td>
+					<td><?php echo $lm_monitor_cron_status['cron_enabled'] ? 'Yes' : 'No (DISABLE_WP_CRON is set)'; ?></td>
 				</tr>
 				<tr>
 					<th>Timezone</th>
