@@ -251,7 +251,7 @@ function lm_monitor_row_meta($links, $file) {
 
     $row_meta = array(
             'docs' => '<a href="' . esc_url(lm_monitor_admin_url('help')) . '">' . esc_html__('Documentation', 'lm-monitor') . '</a>',
-            'support' => '<a href="https://lm-monitor.com/support" target="_blank">' . esc_html__('Support', 'lm-monitor') . '</a>',
+            'support' => '<a href="https://github.com/inhumed-prog/lm-monitor/issues" target="_blank">' . esc_html__('Support', 'lm-monitor') . '</a>',
     );
 
     return array_merge($links, $row_meta);
