@@ -22,8 +22,8 @@ function lm_monitor_verify_admin_access($ajax = false) {
 			), 403);
 		} else {
 			wp_die(
-				__('You do not have sufficient permissions to access this page.', 'lm-monitor'),
-				__('Permission Denied', 'lm-monitor'),
+				esc_html__('You do not have sufficient permissions to access this page.', 'lm-monitor'),
+				esc_html__('Permission Denied', 'lm-monitor'),
 				array('response' => 403)
 			);
 		}
@@ -145,6 +145,7 @@ function lm_monitor_log($message, $level = 'info') {
 		$prefix .= ' WARNING';
 	}
 
+	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 	error_log(sprintf('%s: %s', $prefix, $message));
 }
 
@@ -285,7 +286,7 @@ function lm_monitor_admin_url($page = '', $args = array()) {
  * @return string Site name (hostname)
  */
 function lm_monitor_get_site_name($url) {
-	$parsed = parse_url($url);
+	$parsed = wp_parse_url($url);
 	return isset($parsed['host']) ? $parsed['host'] : $url;
 }
 
