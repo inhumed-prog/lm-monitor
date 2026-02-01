@@ -5,7 +5,7 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit;
+	exit;
 }
 
 /**
@@ -15,19 +15,19 @@ if (!defined('ABSPATH')) {
  * @return void Dies if unauthorized
  */
 function lm_monitor_verify_admin_access($ajax = false) {
-    if (!current_user_can('manage_options')) {
-        if ($ajax) {
-            wp_send_json_error(array(
-                'message' => __('Unauthorized access.', 'lm-monitor')
-            ), 403);
-        } else {
-            wp_die(
-                __('You do not have sufficient permissions to access this page.', 'lm-monitor'),
-                __('Permission Denied', 'lm-monitor'),
-                array('response' => 403)
-            );
-        }
-    }
+	if (!current_user_can('manage_options')) {
+		if ($ajax) {
+			wp_send_json_error(array(
+				'message' => __('Unauthorized access.', 'lm-monitor')
+			), 403);
+		} else {
+			wp_die(
+				__('You do not have sufficient permissions to access this page.', 'lm-monitor'),
+				__('Permission Denied', 'lm-monitor'),
+				array('response' => 403)
+			);
+		}
+	}
 }
 
 /**
@@ -37,11 +37,11 @@ function lm_monitor_verify_admin_access($ajax = false) {
  * @return void Dies if invalid
  */
 function lm_monitor_verify_ajax_nonce($nonce_action = 'lm_monitor_nonce') {
-    if (!check_ajax_referer($nonce_action, 'nonce', false)) {
-        wp_send_json_error(array(
-            'message' => __('Security check failed. Please refresh the page.', 'lm-monitor')
-        ), 403);
-    }
+	if (!check_ajax_referer($nonce_action, 'nonce', false)) {
+		wp_send_json_error(array(
+			'message' => __('Security check failed. Please refresh the page.', 'lm-monitor')
+		), 403);
+	}
 }
 
 /**
@@ -51,23 +51,23 @@ function lm_monitor_verify_ajax_nonce($nonce_action = 'lm_monitor_nonce') {
  * @return array Plugin settings
  */
 function lm_monitor_get_settings($force_refresh = false) {
-    static $settings = null;
+	static $settings = null;
 
-    if ($settings === null || $force_refresh) {
-        $settings = get_option('lm_monitor_settings', array());
+	if ($settings === null || $force_refresh) {
+		$settings = get_option('lm_monitor_settings', array());
 
-        // Apply defaults
-        $defaults = array(
-            'webhook_url' => '',
-            'check_interval' => LM_MONITOR_DEFAULT_CHECK_INTERVAL,
-            'notification_cooldown' => LM_MONITOR_DEFAULT_COOLDOWN,
-            'version' => LM_MONITOR_VERSION
-        );
+		// Apply defaults
+		$defaults = array(
+			'webhook_url' => '',
+			'check_interval' => LM_MONITOR_DEFAULT_CHECK_INTERVAL,
+			'notification_cooldown' => LM_MONITOR_DEFAULT_COOLDOWN,
+			'version' => LM_MONITOR_VERSION
+		);
 
-        $settings = wp_parse_args($settings, $defaults);
-    }
+		$settings = wp_parse_args($settings, $defaults);
+	}
 
-    return $settings;
+	return $settings;
 }
 
 /**
@@ -78,8 +78,8 @@ function lm_monitor_get_settings($force_refresh = false) {
  * @return mixed Setting value
  */
 function lm_monitor_get_setting($key, $default = null) {
-    $settings = lm_monitor_get_settings();
-    return isset($settings[$key]) ? $settings[$key] : $default;
+	$settings = lm_monitor_get_settings();
+	return isset($settings[$key]) ? $settings[$key] : $default;
 }
 
 /**
@@ -88,8 +88,8 @@ function lm_monitor_get_setting($key, $default = null) {
  * @return string Full table name with prefix
  */
 function lm_monitor_get_table_name() {
-    global $wpdb;
-    return $wpdb->prefix . LM_MONITOR_TABLE_NAME;
+	global $wpdb;
+	return $wpdb->prefix . LM_MONITOR_TABLE_NAME;
 }
 
 /**
@@ -100,18 +100,18 @@ function lm_monitor_get_table_name() {
  * @return string|false Email address or false if none found
  */
 function lm_monitor_get_alert_recipient($site) {
-    // Site-specific email
-    if (!empty($site->notify_email) && is_email($site->notify_email)) {
-        return $site->notify_email;
-    }
+	// Site-specific email
+	if (!empty($site->notify_email) && is_email($site->notify_email)) {
+		return $site->notify_email;
+	}
 
-    // Fallback to admin email
-    $admin_email = get_option('admin_email');
-    if (!empty($admin_email) && is_email($admin_email)) {
-        return $admin_email;
-    }
+	// Fallback to admin email
+	$admin_email = get_option('admin_email');
+	if (!empty($admin_email) && is_email($admin_email)) {
+		return $admin_email;
+	}
 
-    return false;
+	return false;
 }
 
 /**
@@ -120,10 +120,10 @@ function lm_monitor_get_alert_recipient($site) {
  * @return array Email headers
  */
 function lm_monitor_get_email_headers() {
-    return array(
-        'From: ' . get_bloginfo('name') . ' <' . get_option('admin_email') . '>',
-        'Content-Type: text/plain; charset=UTF-8'
-    );
+	return array(
+		'From: ' . get_bloginfo('name') . ' <' . get_option('admin_email') . '>',
+		'Content-Type: text/plain; charset=UTF-8'
+	);
 }
 
 /**
@@ -134,18 +134,18 @@ function lm_monitor_get_email_headers() {
  * @return void
  */
 function lm_monitor_log($message, $level = 'info') {
-    if (!LM_MONITOR_ENABLE_LOGGING && $level === 'info') {
-        return;
-    }
+	if (!LM_MONITOR_ENABLE_LOGGING && $level === 'info') {
+		return;
+	}
 
-    $prefix = 'LM Monitor';
-    if ($level === 'error') {
-        $prefix .= ' ERROR';
-    } elseif ($level === 'warning') {
-        $prefix .= ' WARNING';
-    }
+	$prefix = 'LM Monitor';
+	if ($level === 'error') {
+		$prefix .= ' ERROR';
+	} elseif ($level === 'warning') {
+		$prefix .= ' WARNING';
+	}
 
-    error_log(sprintf('%s: %s', $prefix, $message));
+	error_log(sprintf('%s: %s', $prefix, $message));
 }
 
 /**
@@ -156,13 +156,13 @@ function lm_monitor_log($message, $level = 'info') {
  * @return string Formatted string
  */
 function lm_monitor_format_bytes($bytes, $precision = 2) {
-    $units = array('B', 'KB', 'MB', 'GB');
+	$units = array('B', 'KB', 'MB', 'GB');
 
-    for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
-        $bytes /= 1024;
-    }
+	for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+		$bytes /= 1024;
+	}
 
-    return round($bytes, $precision) . ' ' . $units[$i];
+	return round($bytes, $precision) . ' ' . $units[$i];
 }
 
 /**
@@ -172,19 +172,19 @@ function lm_monitor_format_bytes($bytes, $precision = 2) {
  * @return string Hex color code
  */
 function lm_monitor_get_status_color($status) {
-    if ($status === 'UP') {
-        return '#10b981'; // Green
-    }
+	if ($status === 'UP') {
+		return '#10b981'; // Green
+	}
 
-    if ($status === 'DOWN') {
-        return '#ef4444'; // Red
-    }
+	if ($status === 'DOWN') {
+		return '#ef4444'; // Red
+	}
 
-    if (strpos($status, 'ERROR') !== false) {
-        return '#f59e0b'; // Orange
-    }
+	if (strpos($status, 'ERROR') !== false) {
+		return '#f59e0b'; // Orange
+	}
 
-    return '#9ca3af'; // Gray
+	return '#9ca3af'; // Gray
 }
 
 /**
@@ -194,23 +194,23 @@ function lm_monitor_get_status_color($status) {
  * @return string Performance level (fast, medium, slow, very_slow)
  */
 function lm_monitor_get_performance_level($response_time) {
-    if ($response_time === null) {
-        return 'unknown';
-    }
+	if ($response_time === null) {
+		return 'unknown';
+	}
 
-    if ($response_time < LM_MONITOR_RESPONSE_FAST) {
-        return 'fast';
-    }
+	if ($response_time < LM_MONITOR_RESPONSE_FAST) {
+		return 'fast';
+	}
 
-    if ($response_time < LM_MONITOR_RESPONSE_SLOW) {
-        return 'medium';
-    }
+	if ($response_time < LM_MONITOR_RESPONSE_SLOW) {
+		return 'medium';
+	}
 
-    if ($response_time < LM_MONITOR_RESPONSE_VERY_SLOW) {
-        return 'slow';
-    }
+	if ($response_time < LM_MONITOR_RESPONSE_VERY_SLOW) {
+		return 'slow';
+	}
 
-    return 'very_slow';
+	return 'very_slow';
 }
 
 /**
@@ -220,23 +220,23 @@ function lm_monitor_get_performance_level($response_time) {
  * @return string Urgency level (safe, warning, critical, expired)
  */
 function lm_monitor_get_ssl_urgency($days_remaining) {
-    if ($days_remaining === null) {
-        return 'none';
-    }
+	if ($days_remaining === null) {
+		return 'none';
+	}
 
-    if ($days_remaining < 0) {
-        return 'expired';
-    }
+	if ($days_remaining < 0) {
+		return 'expired';
+	}
 
-    if ($days_remaining <= LM_MONITOR_SSL_CRITICAL_DAYS) {
-        return 'critical';
-    }
+	if ($days_remaining <= LM_MONITOR_SSL_CRITICAL_DAYS) {
+		return 'critical';
+	}
 
-    if ($days_remaining <= LM_MONITOR_SSL_WARNING_DAYS) {
-        return 'warning';
-    }
+	if ($days_remaining <= LM_MONITOR_SSL_WARNING_DAYS) {
+		return 'warning';
+	}
 
-    return 'safe';
+	return 'safe';
 }
 
 /**
@@ -246,8 +246,8 @@ function lm_monitor_get_ssl_urgency($days_remaining) {
  * @return int|false Sanitized ID or false if invalid
  */
 function lm_monitor_sanitize_id($id) {
-    $id = absint($id);
-    return $id > 0 ? $id : false;
+	$id = absint($id);
+	return $id > 0 ? $id : false;
 }
 
 /**
@@ -256,7 +256,7 @@ function lm_monitor_sanitize_id($id) {
  * @return bool True if debug mode
  */
 function lm_monitor_is_debug() {
-    return defined('WP_DEBUG') && WP_DEBUG;
+	return defined('WP_DEBUG') && WP_DEBUG;
 }
 
 /**
@@ -267,15 +267,15 @@ function lm_monitor_is_debug() {
  * @return string Admin URL
  */
 function lm_monitor_admin_url($page = '', $args = array()) {
-    $base_page = 'lm-monitor';
+	$base_page = 'lm-monitor';
 
-    if (!empty($page)) {
-        $base_page .= '-' . $page;
-    }
+	if (!empty($page)) {
+		$base_page .= '-' . $page;
+	}
 
-    $args['page'] = $base_page;
+	$args['page'] = $base_page;
 
-    return add_query_arg($args, admin_url('admin.php'));
+	return add_query_arg($args, admin_url('admin.php'));
 }
 
 /**
@@ -285,8 +285,8 @@ function lm_monitor_admin_url($page = '', $args = array()) {
  * @return string Site name (hostname)
  */
 function lm_monitor_get_site_name($url) {
-    $parsed = parse_url($url);
-    return isset($parsed['host']) ? $parsed['host'] : $url;
+	$parsed = parse_url($url);
+	return isset($parsed['host']) ? $parsed['host'] : $url;
 }
 
 /**
@@ -296,7 +296,7 @@ function lm_monitor_get_site_name($url) {
  * @return bool True if HTTPS
  */
 function lm_monitor_is_https($url) {
-    return strpos($url, 'https://') === 0;
+	return strpos($url, 'https://') === 0;
 }
 
 /**
@@ -306,7 +306,7 @@ function lm_monitor_is_https($url) {
  * @return string Prefixed key
  */
 function lm_monitor_transient_key($key) {
-    return 'lm_monitor_' . $key;
+	return 'lm_monitor_' . $key;
 }
 
 /**
@@ -316,7 +316,7 @@ function lm_monitor_transient_key($key) {
  * @return mixed Transient value or false
  */
 function lm_monitor_get_transient($key) {
-    return get_transient(lm_monitor_transient_key($key));
+	return get_transient(lm_monitor_transient_key($key));
 }
 
 /**
@@ -328,7 +328,7 @@ function lm_monitor_get_transient($key) {
  * @return bool True on success
  */
 function lm_monitor_set_transient($key, $value, $expiration) {
-    return set_transient(lm_monitor_transient_key($key), $value, $expiration);
+	return set_transient(lm_monitor_transient_key($key), $value, $expiration);
 }
 
 /**
@@ -338,7 +338,7 @@ function lm_monitor_set_transient($key, $value, $expiration) {
  * @return bool True on success
  */
 function lm_monitor_delete_transient($key) {
-    return delete_transient(lm_monitor_transient_key($key));
+	return delete_transient(lm_monitor_transient_key($key));
 }
 
 /**
@@ -348,10 +348,10 @@ function lm_monitor_delete_transient($key) {
  * @return string User display name or 'Unknown'
  */
 function lm_monitor_get_user_name($user_id = null) {
-    if ($user_id === null) {
-        $user_id = get_current_user_id();
-    }
+	if ($user_id === null) {
+		$user_id = get_current_user_id();
+	}
 
-    $user = get_userdata($user_id);
-    return $user ? $user->display_name : __('Unknown', 'lm-monitor');
+	$user = get_userdata($user_id);
+	return $user ? $user->display_name : __('Unknown', 'lm-monitor');
 }
