@@ -50,15 +50,15 @@ function lm_monitor_settings_page() {
  * @return bool|WP_Error True on success, WP_Error on failure
  */
 function lm_monitor_process_settings_form() {
-	// Get and validate webhook URL
-	$webhook_url = isset($_POST['webhook_url']) ? trim($_POST['webhook_url']) : '';
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in lm_monitor_settings_page() before calling this function
+	$webhook_url = isset( $_POST['webhook_url'] ) ? sanitize_text_field( wp_unslash( $_POST['webhook_url'] ) ) : '';
 
 	// Allow empty URL (to disable webhook)
-	if (!empty($webhook_url)) {
-		$validation = lm_monitor_validate_webhook_url($webhook_url);
+	if ( ! empty( $webhook_url ) ) {
+		$validation = lm_monitor_validate_webhook_url( $webhook_url );
 
-		if (!$validation['valid']) {
-			return new WP_Error('invalid_webhook', $validation['message']);
+		if ( ! $validation['valid'] ) {
+			return new WP_Error( 'invalid_webhook', $validation['message'] );
 		}
 
 		$webhook_url = $validation['url'];
@@ -66,24 +66,24 @@ function lm_monitor_process_settings_form() {
 
 	// Prepare new settings
 	$new_settings = array(
-		'webhook_url' => $webhook_url,
-		'check_interval' => LM_MONITOR_DEFAULT_CHECK_INTERVAL,
+		'webhook_url'           => $webhook_url,
+		'check_interval'        => LM_MONITOR_DEFAULT_CHECK_INTERVAL,
 		'notification_cooldown' => LM_MONITOR_DEFAULT_COOLDOWN,
-		'version' => LM_MONITOR_VERSION
+		'version'               => LM_MONITOR_VERSION,
 	);
 
 	// Update settings
-	update_option('lm_monitor_settings', $new_settings);
+	update_option( 'lm_monitor_settings', $new_settings );
 
 	// Force refresh the settings cache
-	lm_monitor_get_settings(true);
+	lm_monitor_get_settings( true );
 
 	// Log the update
-	lm_monitor_log(sprintf(
+	lm_monitor_log( sprintf(
 		'Settings updated by user %d - Webhook: %s',
 		get_current_user_id(),
-		!empty($webhook_url) ? 'configured' : 'disabled'
-	));
+		! empty( $webhook_url ) ? 'configured' : 'disabled'
+	) );
 
 	return true;
 }
