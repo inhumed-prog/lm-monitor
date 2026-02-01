@@ -277,10 +277,11 @@ function lm_monitor_manual_check_all() {
 			'checked' => $checked,
 			'failed' => $failed,
 			'message' => sprintf(
-					__('Checked %d of %d sites. Failed: %d', 'lm-monitor'),
-					$checked,
-					$total,
-					$failed
+				/* translators: 1: Number of checked sites, 2: Total number of sites, 3: Number of failed checks */
+				__( 'Checked %1$d of %2$d sites. Failed: %3$d', 'lm-monitor' ),
+				$checked,
+				$total,
+				$failed
 			)
 	);
 }
@@ -388,17 +389,19 @@ function lm_monitor_admin_footer_cron_info($text) {
 	}
 
 	$cron_info = sprintf(
-			__('Next check: %s', 'lm-monitor'),
-			$status['next_run_formatted']
+		/* translators: %s: Next check date/time */
+		__( 'Next check: %s', 'lm-monitor' ),
+		$status['next_run_formatted']
 	);
 
 	if ($status['last_run']) {
 		$cron_info .= ' | ' . sprintf(
-						__('Last run: %s (%d checked, %d failed)', 'lm-monitor'),
-						$status['last_run']['timestamp'],
-						$status['last_run']['checked'],
-						$status['last_run']['failed']
-				);
+			/* translators: 1: Last run timestamp, 2: Number of checked sites, 3: Number of failed checks */
+			__( 'Last run: %1$s (%2$d checked, %3$d failed)', 'lm-monitor' ),
+			$status['last_run']['timestamp'],
+			$status['last_run']['checked'],
+			$status['last_run']['failed']
+		);
 	}
 
 	return $text . ' | ' . $cron_info;
