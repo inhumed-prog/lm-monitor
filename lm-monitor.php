@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: LM Monitor
- * Plugin URI: https://lm-monitor.com
+ * Plugin URI: https://github.com/inhumed-prog/lm-monitor
  * Description: Professional website monitoring plugin for agencies with uptime tracking, SSL monitoring, performance metrics, and instant alerts
  * Version: 2.0.0
  * Author: Luk Meyer
- * Author URI: https://lm-monitor.com
+ * Author URI: https://github.com/inhumed-prog
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * License: GPL v2 or later
