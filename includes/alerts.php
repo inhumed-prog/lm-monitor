@@ -31,6 +31,7 @@ function lm_monitor_handle_status_change($id, $url, $old_status, $new_status) {
 		// Build email subject and body
 		$site_name = lm_monitor_get_site_name($url);
 		$subject = sprintf(
+			/* translators: %s: Website name/URL */
 			__('[LM Monitor] Status Alert: %s', 'lm-monitor'),
 			$site_name
 		);
@@ -74,30 +75,39 @@ function lm_monitor_handle_status_change($id, $url, $old_status, $new_status) {
 function lm_monitor_build_status_alert_email($site, $old_status, $new_status, $severity) {
 	$lines = array();
 
+	/* translators: %s: Alert severity level (CRITICAL, WARNING, etc.) */
 	$lines[] = sprintf(__('Website Monitoring Alert - %s', 'lm-monitor'), strtoupper($severity));
 	$lines[] = '';
+	/* translators: %s: Website URL */
 	$lines[] = sprintf(__('Website: %s', 'lm-monitor'), $site->url);
+	/* translators: %s: Previous status (UP, DOWN, ERROR, etc.) */
 	$lines[] = sprintf(__('Previous Status: %s', 'lm-monitor'), $old_status ?: __('UNKNOWN', 'lm-monitor'));
+	/* translators: %s: Current status (UP, DOWN, ERROR, etc.) */
 	$lines[] = sprintf(__('Current Status: %s', 'lm-monitor'), $new_status);
+	/* translators: %s: Timestamp */
 	$lines[] = sprintf(__('Time: %s', 'lm-monitor'), current_time('mysql'));
 
 	// Add performance data if available
 	if ($site->response_time !== null) {
+		/* translators: %s: Response time in milliseconds */
 		$lines[] = sprintf(__('Response Time: %s ms', 'lm-monitor'), number_format($site->response_time, 0));
 	}
 
 	// Add SSL info if available
 	if ($site->ssl_days_remaining !== null) {
+		/* translators: %d: Number of days until SSL expiration */
 		$lines[] = sprintf(__('SSL Days Remaining: %d days', 'lm-monitor'), $site->ssl_days_remaining);
 	}
 
 	$lines[] = '';
 	$lines[] = '---';
 	$lines[] = sprintf(
+		/* translators: %s: Site name */
 		__('This is an automated message from LM Monitor on %s', 'lm-monitor'),
 		get_bloginfo('name')
 	);
 	$lines[] = sprintf(
+		/* translators: %s: Admin URL */
 		__('Manage monitoring: %s', 'lm-monitor'),
 		lm_monitor_admin_url()
 	);
@@ -189,7 +199,8 @@ function lm_monitor_handle_ssl_expiring($id, $url, $days_remaining) {
 		$site_name = lm_monitor_get_site_name($url);
 
 		$subject = sprintf(
-			__('[LM Monitor] %s: SSL Certificate Expiring - %s', 'lm-monitor'),
+			/* translators: 1: Urgency level (URGENT/WARNING), 2: Website name */
+			__('[LM Monitor] %1$s: SSL Certificate Expiring - %2$s', 'lm-monitor'),
 			$urgency,
 			$site_name
 		);
@@ -225,28 +236,35 @@ function lm_monitor_handle_ssl_expiring($id, $url, $days_remaining) {
 function lm_monitor_build_ssl_alert_email($site, $url, $days_remaining, $urgency) {
 	$lines = array();
 
+	/* translators: %s: Urgency level (URGENT/WARNING) */
 	$lines[] = sprintf(__('SSL Certificate Expiration %s', 'lm-monitor'), $urgency);
 	$lines[] = '';
+	/* translators: %s: Website URL */
 	$lines[] = sprintf(__('Website: %s', 'lm-monitor'), $url);
+	/* translators: %d: Number of days remaining */
 	$lines[] = sprintf(__('Days Remaining: %d days', 'lm-monitor'), $days_remaining);
 
 	if ($site->ssl_expiry_date) {
 		$lines[] = sprintf(
+			/* translators: %s: SSL certificate expiry date */
 			__('Expiry Date: %s', 'lm-monitor'),
 			date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($site->ssl_expiry_date))
 		);
 	}
 
 	if ($site->ssl_issuer) {
+		/* translators: %s: SSL certificate issuer name */
 		$lines[] = sprintf(__('Issuer: %s', 'lm-monitor'), $site->ssl_issuer);
 	}
 
+	/* translators: %s: Urgency level */
 	$lines[] = sprintf(__('Urgency: %s', 'lm-monitor'), $urgency);
 	$lines[] = '';
 	$lines[] = __('Please renew your SSL certificate as soon as possible to avoid service interruption.', 'lm-monitor');
 	$lines[] = '';
 	$lines[] = '---';
 	$lines[] = sprintf(
+		/* translators: %s: Site name */
 		__('This is an automated message from LM Monitor on %s', 'lm-monitor'),
 		get_bloginfo('name')
 	);
