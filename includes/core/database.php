@@ -64,8 +64,11 @@ function lm_monitor_get_site($id) {
 		return null;
 	}
 
+	$table = lm_monitor_get_table_name();
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safely generated from constant
 	return $wpdb->get_row($wpdb->prepare(
-		"SELECT * FROM " . lm_monitor_get_table_name() . " WHERE id = %d LIMIT 1",
+		"SELECT * FROM `{$table}` WHERE id = %d LIMIT 1",
 		$id
 	));
 }
@@ -89,24 +92,31 @@ function lm_monitor_get_sites($args = array()) {
 	$args = wp_parse_args($args, $defaults);
 	$table = lm_monitor_get_table_name();
 
-	$sql = "SELECT * FROM `{$table}`";
-
-	// Add WHERE clause if status filter
-	if ($args['status']) {
-		$sql .= $wpdb->prepare(" WHERE `status` = %s", $args['status']);
-	}
-
-	// Add ORDER BY
+	// Whitelist orderby column - only allow specific columns
 	$allowed_orderby = array('id', 'url', 'status', 'last_checked', 'created_at');
-	$orderby = in_array($args['orderby'], $allowed_orderby) ? $args['orderby'] : 'created_at';
+	$orderby = in_array($args['orderby'], $allowed_orderby, true) ? $args['orderby'] : 'created_at';
+	
+	// Whitelist order direction - only ASC or DESC
 	$order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
-	$sql .= " ORDER BY `{$orderby}` {$order}";
 
-	// Add LIMIT
-	if ($args['limit']) {
-		$sql .= $wpdb->prepare(" LIMIT %d", absint($args['limit']));
+	// Build query with status filter if provided
+	if ($args['status']) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and orderby/order are safely whitelisted
+		$sql = $wpdb->prepare(
+			"SELECT * FROM `{$table}` WHERE `status` = %s ORDER BY `{$orderby}` {$order}",
+			$args['status']
+		);
+	} else {
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and orderby/order are safely whitelisted
+		$sql = "SELECT * FROM `{$table}` ORDER BY `{$orderby}` {$order}";
 	}
 
+	// Add LIMIT if specified
+	if ($args['limit']) {
+		$sql .= $wpdb->prepare(' LIMIT %d', absint($args['limit']));
+	}
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- Query built with whitelisted values above
 	return $wpdb->get_results($sql);
 }
 
@@ -121,9 +131,10 @@ function lm_monitor_get_sites_for_checking($limit = 10, $check_interval = 5) {
 	global $wpdb;
 
 	$table = lm_monitor_get_table_name();
-	$minutes_ago = date('Y-m-d H:i:s', strtotime("-{$check_interval} minutes"));
+	$minutes_ago = gmdate('Y-m-d H:i:s', strtotime("-{$check_interval} minutes"));
 
-	$sql = $wpdb->prepare(
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safely generated from constant
+	return $wpdb->get_results($wpdb->prepare(
 		"SELECT * FROM `{$table}` 
 		 WHERE `last_checked` IS NULL 
 		 OR `last_checked` < %s 
@@ -131,9 +142,7 @@ function lm_monitor_get_sites_for_checking($limit = 10, $check_interval = 5) {
 		 LIMIT %d",
 		$minutes_ago,
 		absint($limit)
-	);
-
-	return $wpdb->get_results($sql);
+	));
 }
 
 /**
@@ -190,6 +199,7 @@ function lm_monitor_update_status($id, $new_status, $data = array()) {
 	}
 
 	// Update database
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 	$updated = $wpdb->update(
 		$table,
 		$update_data,
@@ -235,6 +245,7 @@ function lm_monitor_delete_site($id) {
 
 	$table = lm_monitor_get_table_name();
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 	$deleted = $wpdb->delete(
 		$table,
 		array('id' => $id),
@@ -256,6 +267,7 @@ function lm_monitor_url_exists($url) {
 	$table = lm_monitor_get_table_name();
 	$url = esc_url_raw($url);
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$count = $wpdb->get_var($wpdb->prepare(
 		"SELECT COUNT(*) FROM `{$table}` WHERE `url` = %s",
 		$url
@@ -284,6 +296,7 @@ function lm_monitor_get_stats() {
 	);
 
 	// Get total count
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$stats['total'] = intval($wpdb->get_var("SELECT COUNT(*) FROM `{$table}`"));
 
 	if ($stats['total'] === 0) {
@@ -291,23 +304,28 @@ function lm_monitor_get_stats() {
 	}
 
 	// Get status counts
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$stats['up'] = intval($wpdb->get_var(
 		"SELECT COUNT(*) FROM `{$table}` WHERE `status` = 'UP'"
 	));
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$stats['down'] = intval($wpdb->get_var(
 		"SELECT COUNT(*) FROM `{$table}` WHERE `status` = 'DOWN'"
 	));
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$stats['error'] = intval($wpdb->get_var(
 		"SELECT COUNT(*) FROM `{$table}` WHERE `status` LIKE 'ERROR%'"
 	));
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$stats['unknown'] = intval($wpdb->get_var(
 		"SELECT COUNT(*) FROM `{$table}` WHERE `status` IS NULL"
 	));
 
 	// Get SSL expiring soon count
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name safely generated from constant
 	$stats['ssl_expiring_soon'] = intval($wpdb->get_var($wpdb->prepare(
 		"SELECT COUNT(*) FROM `{$table}` 
 		 WHERE `ssl_days_remaining` IS NOT NULL 
