@@ -387,10 +387,5 @@ jQuery(function($) {
                 error: thrownError
             });
         });
-
-        console.log('LM Monitor: Debug mode enabled');
     }
-
-    // Log that script is loaded
-    console.log('LM Monitor: Admin script loaded');
 });
