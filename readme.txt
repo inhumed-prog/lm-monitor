@@ -1,3 +1,4 @@
+
 === LM Monitor ===
 Contributors: lukmeyer
 Donate link: https://paypal.me/LukMeyer030
@@ -158,7 +159,7 @@ No data is sent to the plugin developer or any third parties.
 == Changelog ==
 
 = 2.0.0 =
-Release Date: Feburary 01, 2026
+Release Date: January 31, 2026
 
 * Initial public release
 * Uptime monitoring with 5-minute intervals
