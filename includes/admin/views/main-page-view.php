@@ -19,8 +19,8 @@ if (!defined('ABSPATH')) {
 		<div class="notice notice-info" style="background: #e7f3ff; border-left: 4px solid #0073aa; padding: 15px; margin: 20px 0;">
 			<p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">🔍 DEBUG INFO</p>
 			<pre style="background: #fff; padding: 12px; border: 1px solid #ccc; border-radius: 4px; overflow: auto; max-height: 500px; font-size: 13px; line-height: 1.6; margin: 0; font-family: 'Courier New', monospace; white-space: pre-wrap;"><?php
-				foreach ($debug_info as $line) {
-					echo esc_html($line) . "\n";
+				foreach ($debug_info as $lm_monitor_line) {
+					echo esc_html($lm_monitor_line) . "\n";
 				}
 				?></pre>
 		</div>
@@ -131,8 +131,9 @@ if (!defined('ABSPATH')) {
 		<h2>
 			<?php
 			printf(
-					esc_html__('Monitored Websites (%d)', 'lm-monitor'),
-					count($sites)
+				/* translators: %d: Number of monitored websites */
+				esc_html__( 'Monitored Websites (%d)', 'lm-monitor' ),
+				count( $sites )
 			);
 			?>
 		</h2>
@@ -148,12 +149,13 @@ if (!defined('ABSPATH')) {
 		<?php endif; ?>
 	</div>
 
-	<?php if (!empty($cron_status) && $cron_status['is_scheduled']): ?>
+	<?php if ( ! empty( $cron_status ) && $cron_status['is_scheduled'] ) : ?>
 		<p class="description lm-monitor-cron-info">
 			<?php
 			printf(
-					esc_html__('Next automatic check: %s', 'lm-monitor'),
-					'<strong>' . esc_html($cron_status['next_run_formatted']) . '</strong>'
+				/* translators: %s: Date and time of next automatic check */
+				esc_html__( 'Next automatic check: %s', 'lm-monitor' ),
+				'<strong>' . esc_html( $cron_status['next_run_formatted'] ) . '</strong>'
 			);
 			?>
 		</p>
@@ -175,43 +177,53 @@ if (!defined('ABSPATH')) {
 			</thead>
 			<tbody>
 			<?php if (!empty($sites)): ?>
-				<?php foreach ($sites as $site): ?>
-					<tr data-id="<?php echo absint($site->id); ?>">
+				<?php foreach ($sites as $lm_monitor_site): ?>
+					<tr data-id="<?php echo absint($lm_monitor_site->id); ?>">
 						<td class="site-url">
-							<a href="<?php echo esc_url($site->url); ?>"
+							<a href="<?php echo esc_url($lm_monitor_site->url); ?>"
 							   target="_blank"
 							   rel="noopener noreferrer"
 							   title="<?php esc_attr_e('Open website in new tab', 'lm-monitor'); ?>">
-								<?php echo esc_html($site->url); ?>
+								<?php echo esc_html($lm_monitor_site->url); ?>
 							</a>
 						</td>
 
 						<td class="status">
-							<?php echo lm_monitor_render_status($site->status); ?>
+							<?php
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Render function returns escaped HTML
+							echo lm_monitor_render_status( $lm_monitor_site->status );
+							?>
 						</td>
 
 						<td class="response-time">
-							<?php echo lm_monitor_render_response_time($site->response_time); ?>
+							<?php
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Render function returns escaped HTML
+							echo lm_monitor_render_response_time( $lm_monitor_site->response_time );
+							?>
 						</td>
 
 						<td class="ssl-expiry">
-							<?php echo lm_monitor_render_ssl_expiry($site->ssl_days_remaining, $site->ssl_expiry_date); ?>
+							<?php
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Render function returns escaped HTML
+							echo lm_monitor_render_ssl_expiry( $lm_monitor_site->ssl_days_remaining, $lm_monitor_site->ssl_expiry_date );
+							?>
 						</td>
 
 						<td class="uptime">
 							<?php
-							$uptime = lm_monitor_calculate_uptime($site);
-							echo lm_monitor_render_uptime($uptime);
+							$lm_monitor_uptime = lm_monitor_calculate_uptime( $lm_monitor_site );
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Render function returns escaped HTML
+							echo lm_monitor_render_uptime( $lm_monitor_uptime );
 							?>
 						</td>
 
 						<td class="notify-email">
 							<?php
-							if (!empty($site->notify_email)) {
+							if (!empty($lm_monitor_site->notify_email)) {
 								printf(
 										'<span style="color: #4f46e5;" title="%s">✉ %s</span>',
-										esc_attr($site->notify_email),
-										esc_html($site->notify_email)
+										esc_attr($lm_monitor_site->notify_email),
+										esc_html($lm_monitor_site->notify_email)
 								);
 							} else {
 								echo '<span style="color: #9ca3af;">—</span>';
@@ -221,9 +233,9 @@ if (!defined('ABSPATH')) {
 
 						<td class="last-checked">
 							<?php
-							if ($site->last_checked) {
-								echo '<span title="' . esc_attr($site->last_checked) . '">' .
-										esc_html(lm_monitor_time_ago($site->last_checked)) . '</span>';
+							if ($lm_monitor_site->last_checked) {
+								echo '<span title="' . esc_attr($lm_monitor_site->last_checked) . '">' .
+										esc_html(lm_monitor_time_ago($lm_monitor_site->last_checked)) . '</span>';
 							} else {
 								esc_html_e('Never', 'lm-monitor');
 							}
@@ -234,7 +246,7 @@ if (!defined('ABSPATH')) {
 							<div class="lm-monitor-action-buttons">
 								<button
 										class="button lm-monitor-check"
-										data-id="<?php echo absint($site->id); ?>"
+										data-id="<?php echo absint($lm_monitor_site->id); ?>"
 										type="button"
 										title="<?php esc_attr_e('Check this website now', 'lm-monitor'); ?>"
 								>
@@ -242,7 +254,7 @@ if (!defined('ABSPATH')) {
 								</button>
 								<button
 										class="button lm-monitor-delete"
-										data-id="<?php echo absint($site->id); ?>"
+										data-id="<?php echo absint($lm_monitor_site->id); ?>"
 										type="button"
 										title="<?php esc_attr_e('Remove from monitoring', 'lm-monitor'); ?>"
 								>
@@ -268,9 +280,10 @@ if (!defined('ABSPATH')) {
 			<p class="description">
 				<?php
 				printf(
-						esc_html__('Monitoring %d websites. Total checks performed: %d', 'lm-monitor'),
-						count($sites),
-						array_sum(array_column($sites, 'check_count'))
+					/* translators: 1: Number of websites, 2: Total number of checks performed */
+					esc_html__('Monitoring %1$d websites. Total checks performed: %2$d', 'lm-monitor'),
+					count($sites),
+					intval( array_sum( array_column( $sites, 'check_count' ) ) )
 				);
 				?>
 			</p>
