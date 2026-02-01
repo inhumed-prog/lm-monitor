@@ -84,8 +84,6 @@ if (!defined('ABSPATH')) {
                     },
                     timeout: 15000,
                     success: function(response) {
-                        console.log('Webhook response:', response);
-
                         if (response.success) {
                             $result.html('<div class="notice notice-success inline"><p><strong>Success!</strong> ' + response.data + '</p></div>');
                         } else {
@@ -94,8 +92,6 @@ if (!defined('ABSPATH')) {
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('AJAX error:', {xhr: xhr, status: status, error: error});
-
                         var errorMsg = 'Network error. Please try again.';
                         if (status === 'timeout') {
                             errorMsg = 'Request timeout. The webhook may be slow or unreachable.';
