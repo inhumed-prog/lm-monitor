@@ -1,5 +1,6 @@
 === LM Monitor ===
 Contributors: lukmeyer
+Donate link: https://paypal.me/LukMeyer030
 Tags: monitoring, uptime, ssl, alerts, webhook
 Requires at least: 5.8
 Tested up to: 6.7
@@ -157,7 +158,7 @@ No data is sent to the plugin developer or any third parties.
 == Changelog ==
 
 = 2.0.0 =
-Release Date: January 31, 2026
+Release Date: Feburary 01, 2026
 
 * Initial public release
 * Uptime monitoring with 5-minute intervals
